@@ -7,13 +7,13 @@ index b03aca42f..3fe0ce77c 100644
  			continue;
  #endif
 +
-+#if defined(RTAX18T) || defined(RTHAR) || defined(RTCR660X) || defined(RTTX1801) || defined(RTCMCCA9)
++#if defined(RTAX18T) || defined(RTHAR) || defined(RTCR660X) || defined(RTTX1801) || defined(RTCMCCA9) || defined(RTMIR3P)
 +		// Special case : bypass L4 (powerline)
 +		if (lan_count == 4)
 +			continue;
 +#endif
 +		
-+#if defined(RTQ20)
++#if defined(RTQ20) || defined(RTXG1) || defined(RTMIR3G)
 +		// Special case : bypass L3&L4 (powerline)
 +		if (lan_count == 3 || lan_count == 4)
 +			continue;
@@ -26,13 +26,13 @@ index b03aca42f..3fe0ce77c 100644
  			lan_count--;
  #endif
 +
-+#if defined(RTAX18T) || defined(RTHAR) || defined(RTCR660X) || defined(RTTX1801) || defined(RTCMCCA9)
++#if defined(RTAX18T) || defined(RTHAR) || defined(RTCR660X) || defined(RTTX1801) || defined(RTCMCCA9) || defined(RTMIR3P)
 +		// Special case : bypass L4 (powerline)
 +		if (lan_count >= 4)
 +			lan_count--;
 +#endif
 +	
-+#if defined(RTQ20)
++#if defined(RTQ20) || defined(RTXG1) || defined(RTMIR3G)
 +		// Special case : bypass L3&L4 (powerline)
 +		if (lan_count >= 3)
 +			lan_count=2;
