@@ -23,6 +23,7 @@ on:
         - RT-TX1801
         - RT-XG1
         - RT-MIR3G
+        - RT-MIR3P
         default:
           RT-AX18T
       applypatch:
