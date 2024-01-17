@@ -21,12 +21,13 @@ on:
         - RT-A040WQ
         - RT-MSG1500
         - RT-RS1200P
+        - RT-WIA3300
       uploadanon:
         type: boolean
         description: 'upload firmware to anonfiles'
         default: 'false'
 env:
-  REPOSITORY_URL: https://github.com/stkuroneko/asuswrt-modx.git
+  REPOSITORY_URL: https://github.com/Bonnie2980/asuswrt-modx.git
   WORK_PATH: /opt/asuswrt-modx
   TIME_ZONE: Asia/Shanghai
   FIRMWARE_PATH: /opt/firmwares
