@@ -45,6 +45,7 @@ jobs:
         sudo dpkg -l | awk '/ii  lib.*deb.sury.org/ {gsub(/:.*/, s, $2); print $2}' | xargs apt show -a | awk '/Package:/ {p=$2} /APT-Sources: .*focal\/main/ {print p"/focal"}' | sudo xargs eatmydata apt install --allow-downgrades
         GIT_REPO="ppa:git-core/ppa"
         sudo add-apt-repository $GIT_REPO -y
+        sudo add-apt-repository universe -y
         sudo apt update
         wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gcc-4.8/g++-4.8_4.8.5-4ubuntu8_amd64.deb
         wget http://mirrors.kernel.org/ubuntu/pool/universe/g/gcc-4.8/libstdc++-4.8-dev_4.8.5-4ubuntu8_amd64.deb
