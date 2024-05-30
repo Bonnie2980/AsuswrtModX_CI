@@ -26,6 +26,7 @@ on:
         - RT-MIR3P
         - RT-GAX1800
         - RT-T6M
+        - RT-T6M_UBoot
         default:
           RT-AX18T
       applypatch:
