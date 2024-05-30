@@ -1,5 +1,5 @@
 diff --git a/release/src/router/httpd/web.c b/release/src/router/httpd/web.c
-index b03aca42f..3fe0ce77c 100644
+index b03aca42f..69c32ce23 100644
 --- a/release/src/router/httpd/web.c
 +++ b/release/src/router/httpd/web.c
 @@ -35038,6 +35038,18 @@ ej_get_wan_lan_status(int eid, webs_t wp, int argc, char **argv)
@@ -7,7 +7,7 @@ index b03aca42f..3fe0ce77c 100644
  			continue;
  #endif
 +
-+#if defined(RTAX18T) || defined(RTHAR) || defined(RTCR660X) || defined(RTTX1801) || defined(RTCMCCA9) || defined(RTMIR3P) || defined(RTGAX1800)
++#if defined(RTAX18T) || defined(RTHAR) || defined(RTCR660X) || defined(RTTX1801) || defined(RTCMCCA9) || defined(RTMIR3P) || defined(RTGAX1800) || defined(RTT6M)
 +		// Special case : bypass L4 (powerline)
 +		if (lan_count == 4)
 +			continue;
