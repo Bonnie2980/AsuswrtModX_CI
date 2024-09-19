@@ -26,8 +26,9 @@ on:
         - RT-MIR3P
         - RT-GAX1800
         - RT-T6M
+        - RT-XG1
         default:
-          RT-AX18T
+          RT-XG1
       applypatch:
         type: boolean
         description: 'apply patch to display lan numbers'
