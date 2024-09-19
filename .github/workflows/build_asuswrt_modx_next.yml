@@ -25,8 +25,10 @@ on:
         - RT-MIR3G
         - RT-MIR3P
         - RT-GAX1800
+        - RT-GAX1800B
         - RT-T6M
         - RT-XG1
+        - RT-T6M_UBoot
         default:
           RT-XG1
       applypatch:
