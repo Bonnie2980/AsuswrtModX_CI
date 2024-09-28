@@ -28,9 +28,9 @@ on:
         - RT-GAX1800B
         - RT-T6M
         - RT-XG1
-        - RT-T6M_UBoot
+        - RT-RX6000
         default:
-          RT-XG1
+          RT-RX6000
       applypatch:
         type: boolean
         description: 'apply patch to display lan numbers'
