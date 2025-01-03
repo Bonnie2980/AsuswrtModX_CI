@@ -29,6 +29,7 @@ on:
         - RT-T6M
         - RT-XG1
         - RT-RX6000
+        - RT-KOMIA8
         default:
           RT-RX6000
       applypatch:
