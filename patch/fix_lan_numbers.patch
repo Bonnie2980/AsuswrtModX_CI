@@ -7,7 +7,7 @@ index b03aca42f..69c32ce23 100644
  			continue;
  #endif
 +
-+#if defined(RTAX18T) || defined(RTHAR) || defined(RTCR660X) || defined(RTTX1801) || defined(RTCMCCA9) || defined(RTMIR3P) || defined(RTGAX1800) || defined(RTGAX1800B) || defined(RTT6M) || defined(RTRX6000) || defined(RTKOMIA8)
++#if defined(RTAX18T) || defined(RTHAR) || defined(RTCR660X) || defined(RTTX1801) || defined(RTCMCCA9) || defined(RTMIR3P) || defined(RTGAX1800) || defined(RTGAX1800B) || defined(RTT6M) || defined(RTRX6000) || defined(RTKOMIA8) || defined(RTMPAX18)
 +		// Special case : bypass L4 (powerline)
 +		if (lan_count == 4)
 +			continue;
@@ -26,7 +26,7 @@ index b03aca42f..69c32ce23 100644
  			lan_count--;
  #endif
 +
-+#if defined(RTAX18T) || defined(RTHAR) || defined(RTCR660X) || defined(RTTX1801) || defined(RTCMCCA9) || defined(RTMIR3P) || defined(RTGAX1800) || defined(RTGAX1800B) || defined(RTT6M) || defined(RTRX6000) || defined(RTKOMIA8)
++#if defined(RTAX18T) || defined(RTHAR) || defined(RTCR660X) || defined(RTTX1801) || defined(RTCMCCA9) || defined(RTMIR3P) || defined(RTGAX1800) || defined(RTGAX1800B) || defined(RTT6M) || defined(RTRX6000) || defined(RTKOMIA8) || defined(RTMPAX18)
 +		// Special case : bypass L4 (powerline)
 +		if (lan_count >= 4)
 +			lan_count--;
