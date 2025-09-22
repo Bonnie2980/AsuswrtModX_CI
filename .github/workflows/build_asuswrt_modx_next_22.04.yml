@@ -30,8 +30,9 @@ on:
         - RT-XG1
         - RT-RX6000
         - RT-KOMIA8
+        - RT-MPAX18
         default:
-          RT-RX6000
+          RT-MPAX18
       applypatch:
         type: boolean
         description: 'apply patch to display lan numbers'
