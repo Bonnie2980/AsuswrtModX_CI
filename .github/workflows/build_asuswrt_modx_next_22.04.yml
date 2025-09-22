@@ -67,7 +67,7 @@ jobs:
         # 32位兼容库支持（需先添加架构）
         sudo dpkg --add-architecture i386
         sudo apt update
-        sudo apt install -y lib32gcc1 lib32stdc++6 libc6-dev-i386 lib32z1
+        sudo apt install -y lib32gcc-s1 lib32stdc++6 libc6-dev-i386 lib32z1
         # 压缩工具链
         sudo apt install -y p7zip-full upx lzma-dev liblzma-dev
         # 网络工具
