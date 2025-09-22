@@ -59,32 +59,24 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        # 添加32位架构支持
+        # 更新系统并安装基础编译工具链
+        sudo apt update && sudo apt upgrade -y
+        sudo apt install -y build-essential git cmake wget gcc-multilib g++-multilib
+        # 安装文档生成工具链
+        sudo apt install -y asciidoc texinfo docbook-xsl xsltproc intltool binutils-dev
+        # 32位兼容库支持（需先添加架构）
         sudo dpkg --add-architecture i386
-        # 更新软件源
-        sudo apt update -y
-        sudo apt upgrade -y
-        # 安装必要工具（解决eatmydata依赖）
-        sudo apt install -y eatmydata
-        # 基础编译工具链
-        sudo eatmydata apt-get -y --no-install-recommends install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev
-        # 安装Python（使用系统支持的版本，如需旧版本需单独处理）
-        sudo eatmydata apt-get -y --no-install-recommends install patch python3 python2 unzip zlib1g-dev lib32gcc-s1 libc6-dev-i386 subversion flex uglifyjs git
-        # 多架构编译工具
-        sudo eatmydata apt-get -y --no-install-recommends install gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev
-        # 自动化工具和文档生成工具
-        sudo eatmydata apt-get -y --no-install-recommends install autoconf automake libtool autopoint device-tree-compiler g++-multilib antlr3 gperf wget libncurses5:i386
-        # 32位库和开发工具
-        sudo eatmydata apt-get -y --no-install-recommends install libelf1:i386 lib32z1 lib32stdc++6 gtk-doc-tools intltool binutils-dev cmake lzma liblzma-dev
-        # 额外依赖库
-        sudo eatmydata apt-get -y --no-install-recommends install uuid-dev liblzo2-dev xsltproc dos2unix docbook-xsl sharutils autogen shtool gengetopt libltdl-dev libtool-bin bison
-        # 处理Python2/3共存问题
-        sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 100
-        sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 20
-        # 安装pip2（如果需要）
-        #curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
-        #sudo python2 get-pip.py
-        #rm get-pip.py
+        sudo apt update
+        sudo apt install -y lib32gcc1 lib32stdc++6 libc6-dev-i386 lib32z1
+        # 压缩工具链
+        sudo apt install -y p7zip-full upx lzma-dev liblzma-dev
+        # 网络工具
+        sudo apt install -y subversion msmtp git-core
+        # 调试工具
+        sudo apt install -y gdb strace valgrind
+        # 其他开发依赖
+        sudo apt install -y python3 python2.7 unzip bzip2 gawk gettext flex uglifyjs qemu-utils libssl-dev libglib2.0-dev libelf-dev 
+        sudo apt install -y autoconf automake libtool bison gengetopt libltdl-dev libtool-bin bison uuid-dev liblzo2-dev dos2unix
         sudo timedatectl set-timezone "$TIME_ZONE"
     - name: Clone source code
       run: |
