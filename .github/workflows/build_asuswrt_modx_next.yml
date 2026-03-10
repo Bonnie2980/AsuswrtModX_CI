@@ -32,6 +32,7 @@ on:
         - RT-RX6000
         - RT-KOMIA8
         - RT-MPAX18
+        - RT-GAX1800F
         default:
           RT-MPAX18
       applypatch:
