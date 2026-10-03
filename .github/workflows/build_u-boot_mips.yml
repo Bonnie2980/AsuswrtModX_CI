@@ -1,0 +1,177 @@
+name: Build MT7621 U-Boot
+
+on:
+  workflow_dispatch:
+    inputs:
+      board:
+        description: board profile to build
+        required: true
+        type: choice
+        default: t6gs
+        options:
+          - rtax53u
+          - rtax54
+          - xd4s
+          - 4gax56
+          - r3p
+          - r6800
+          - rm2100
+          - hiwifi4
+          - e8820s
+          - a040wq
+          - msg1500x00
+          - a9
+          - c3n
+          - h3ctx180x
+          - xg1
+          - ax18t
+          - q20
+          - cr660x
+          - bzv
+          - rx6000
+          - gax1800
+          - t6gs
+      upstream_ref:
+        description: 上游源码 ref（分支/标签/commit），留空使用 master
+        required: false
+        type: string
+        default: master
+
+permissions:
+  contents: read
+
+env:
+  UPSTREAM_REPO: https://github.com/vb1980/Uboot-mips.git
+
+jobs:
+  build:
+    name: Build ${{ inputs.board || 'all-boards' }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out caller repository
+        uses: actions/checkout@v4
+
+      - name: Resolve board and upstream ref
+        id: cfg
+        env:
+          INPUT_BOARD: ${{ inputs.board }}
+          INPUT_REF: ${{ inputs.upstream_ref }}
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            board="$INPUT_BOARD"
+            ref="${INPUT_REF:-master}"
+          else
+            board="rtax53u"
+            ref="master"
+          fi
+          test -n "$board"
+          echo "board=$board" >> "$GITHUB_OUTPUT"
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+          echo "board=$board ref=$ref"
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential bison flex python2-dev swig xz-utils
+          python2 --version
+
+      - name: Clone upstream U-Boot source
+        env:
+          UPSTREAM_REF: ${{ steps.cfg.outputs.ref }}
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3; do
+            echo "clone attempt $attempt"
+            rm -rf "$GITHUB_WORKSPACE/upstream"
+            if git clone --depth 1 --branch "$UPSTREAM_REF" \
+                 "$UPSTREAM_REPO" "$GITHUB_WORKSPACE/upstream"; then
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "failed to clone $UPSTREAM_REPO after 3 attempts" >&2
+              exit 1
+            fi
+            sleep 10
+          done
+          cd "$GITHUB_WORKSPACE/upstream"
+          echo "UPSTREAM_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          git log -1 --oneline
+
+      - name: Extract bundled MIPS toolchain
+        working-directory: ${{ github.workspace }}/upstream
+        run: |
+          set -euo pipefail
+          test -s toolchains/SHA256SUMS
+          sha256sum -c toolchains/SHA256SUMS
+          mkdir -p "$RUNNER_TEMP/mt7621-toolchain"
+          tar -xJf toolchains/buildroot-mipsel-uclibc-gcc-6.4.0.tar.xz \
+            -C "$RUNNER_TEMP/mt7621-toolchain"
+          export LD_LIBRARY_PATH="$RUNNER_TEMP/mt7621-toolchain/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+          echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> "$GITHUB_ENV"
+          "$RUNNER_TEMP/mt7621-toolchain/usr/bin/mipsel-linux-gcc" --version
+          printf 'int toolchain_probe;\n' | \
+            "$RUNNER_TEMP/mt7621-toolchain/usr/bin/mipsel-linux-gcc" \
+            -x c -c -o "$RUNNER_TEMP/toolchain-probe.o" -
+
+      - name: Configure
+        env:
+          BOARD: ${{ steps.cfg.outputs.board }}
+        working-directory: ${{ github.workspace }}/upstream
+        run: |
+          set -euo pipefail
+          test -s "config_$BOARD"
+          cp "config_$BOARD" .config
+          make PYTHON=python2 \
+            CROSS_COMPILE="$RUNNER_TEMP/mt7621-toolchain/usr/bin/mipsel-linux-" \
+            olddefconfig
+
+      - name: Build SPL and U-Boot
+        working-directory: ${{ github.workspace }}/upstream
+        run: |
+          set -euo pipefail
+          make PYTHON=python2 \
+            CROSS_COMPILE="$RUNNER_TEMP/mt7621-toolchain/usr/bin/mipsel-linux-" \
+            -j2 spl/u-boot-spl
+          make PYTHON=python2 \
+            CROSS_COMPILE="$RUNNER_TEMP/mt7621-toolchain/usr/bin/mipsel-linux-" \
+            -j2
+
+      - name: Show device tree sources on failure
+        if: failure()
+        working-directory: ${{ github.workspace }}/upstream
+        run: |
+          for source in arch/mips/dts/.*.dtb.pre.tmp arch/mips/dts/.*.dtb.dts.tmp; do
+            if test -f "$source"; then
+              echo "--- $source ---"
+              nl -ba "$source" | tail -n 35
+            fi
+          done
+
+      - name: Stage image and configuration
+        env:
+          BOARD: ${{ steps.cfg.outputs.board }}
+          UPSTREAM_REF: ${{ steps.cfg.outputs.ref }}
+        working-directory: ${{ github.workspace }}/upstream
+        run: |
+          set -euo pipefail
+          test -s u-boot-mt7621.bin
+          mkdir -p "$GITHUB_WORKSPACE/dist/$BOARD"
+          cp u-boot-mt7621.bin "$GITHUB_WORKSPACE/dist/$BOARD/u-boot-mt7621_$BOARD.bin"
+          cp .config "$GITHUB_WORKSPACE/dist/$BOARD/config"
+          ( cd "$GITHUB_WORKSPACE/dist/$BOARD" && \
+            sha256sum "u-boot-mt7621_$BOARD.bin" > SHA256SUMS )
+          {
+            echo "upstream_repo=$UPSTREAM_REPO"
+            echo "upstream_ref=$UPSTREAM_REF"
+            echo "upstream_commit=$UPSTREAM_COMMIT"
+          } > "$GITHUB_WORKSPACE/dist/$BOARD/UPSTREAM"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: u-boot-mt7621-${{ steps.cfg.outputs.board }}
+          path: dist/${{ steps.cfg.outputs.board }}/
+          if-no-files-found: error
+          retention-days: 14
