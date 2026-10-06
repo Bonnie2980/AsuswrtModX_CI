@@ -31,11 +31,11 @@ concurrency:
 
 jobs:
   build:
-    name: Build ${{ inputs.board }}
+    name: Build ${{ inputs.board || '360-T6GS' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 720
     env:
-      SELECTED_BOARD: ${{ inputs.board }}
+      SELECTED_BOARD: ${{ inputs.board || '360-T6GS' }}
       BUILD_ROOT: /build
       SOURCE_REPO: https://github.com/vb1980/asuswrt-modx-next.git
       SOURCE_REF: ${{ inputs.ref || '69196' }}
@@ -117,23 +117,6 @@ jobs:
             \( -name "*.trx" -o -name "*.md5" \) \
             -exec cp -a {} artifacts/ \;
           test -n "$(find artifacts -maxdepth 1 -type f -name "*.trx" -print -quit)"
-
-      - name: Rename firmware with board name
-        shell: bash
-        working-directory: ${{ env.BUILD_ROOT }}
-        run: |
-          set -euo pipefail
-          cd artifacts
-          shopt -s nullglob
-          for trx in *.trx; do
-            base="${trx%.trx}"
-            new="${base}_${SELECTED_BOARD}.trx"
-            mv -- "$trx" "$new"
-            md5sum "$new" > "${new%.trx}.md5"
-            rm -f "${base}.md5"
-            printf 'Renamed: %s -> %s\n' "$trx" "$new"
-          done
-          ls -l
 
       - name: Upload firmware
         uses: actions/upload-artifact@v4

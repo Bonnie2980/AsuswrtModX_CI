@@ -1,15 +1,12 @@
 name: Build Asuswrt-Modx Next 5.2.2
 
 on:
-  push:
-    branches:
-      - master
   workflow_dispatch:
     inputs:
       board:
         description: Board profile
         required: true
-        default: ALL
+        default: 360-T6GS
         type: choice
         options:
           - R3G
@@ -22,7 +19,6 @@ on:
           - RM2100
           - SIM-AX18T
           - 360-T6GS
-          - ALL
       ref:
         description: Upstream branch/tag/commit to build
         required: false
@@ -38,15 +34,11 @@ concurrency:
 
 jobs:
   build:
-    name: Build ${{ matrix.board }}
+    name: Build ${{ inputs.board || '360-T6GS' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 720
-    strategy:
-      fail-fast: false
-      matrix:
-        board: ${{ fromJSON((inputs.board == '' || inputs.board == 'ALL') && '["R3G","HIWIFI4","E8820S","A040WQ","MSG1500","R6800","R3P","RM2100","SIM-AX18T","360-T6GS"]' || format('["{0}"]', inputs.board)) }}
     env:
-      SELECTED_BOARD: ${{ matrix.board }}
+      SELECTED_BOARD: ${{ inputs.board || '360-T6GS' }}
       BUILD_ROOT: /build
       SOURCE_REPO: https://github.com/vb1980/asuswrt-modx-next.git
       SOURCE_REF: ${{ inputs.ref || 'master' }}
